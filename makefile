@@ -28,4 +28,4 @@ build-linux:
 	docker run -v $(shell pwd)/test/plugins:/root/test/plugins southclaws/chrono-build
 
 build-inside:
-	cd build && cmake .. && make
+	cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && make -j4

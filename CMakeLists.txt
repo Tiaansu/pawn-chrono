@@ -5,8 +5,14 @@ project(pawn-chrono)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/lib/cmake-modules")
 
 if(UNIX)
-	set(CMAKE_CXX_FLAGS "-m32 -static -fvisibility=hidden")
-	set(CMAKE_C_FLAGS "-m32 -static -fvisibility=hidden")
+	set(CMAKE_CXX_FLAGS "-m32 -fPIC -fvisibility=hidden")
+	set(CMAKE_C_FLAGS "-m32 -fPIC -fvisibility=hidden")
+
+	if(CMAKE_BUILD_TYPE STREQUAL "Release")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
+	endif()
+
 	set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS OFF)
 endif()
 

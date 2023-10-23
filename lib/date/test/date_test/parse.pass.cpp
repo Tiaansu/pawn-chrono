@@ -45,6 +45,8 @@ test_a()
         std::istringstream in{"Sun 2016-12-11"};
         sys_days tp;
         in >> parse("%A %F", tp);
+        // this may fail with libstdc++, see https://github.com/HowardHinnant/date/issues/388
+        // possible workaround: compile date.h with -DONLY_C_LOCALE=1
         assert(!in.fail());
         assert(!in.bad());
         assert(!in.eof());
@@ -620,6 +622,21 @@ test_p()
         assert(!in.fail());
         assert(!in.bad());
         assert(tp == sys_days{2016_y/12/11} + hours{23});
+    }
+    {
+        std::istringstream in{"1986-12-01 01:01:01 pm"};
+        sys_time<seconds> tp;
+        in >> parse("%Y-%m-%d %I:%M:%S %p", tp);
+        assert(!in.fail());
+        assert(!in.bad());
+        assert(tp == sys_days{1986_y/12/01} + hours{13} + minutes{01} + seconds{01});
+    }
+    {
+        std::istringstream in{"1986-12-01 01:01:01"};
+        sys_time<seconds> tp;
+        in >> parse("%Y-%m-%d %I:%M:%S", tp);
+        // The test will fail because %I needs the %p option to shows if it is AM or PM
+        assert(in.fail());
     }
 }
 

@@ -6,7 +6,7 @@
 
 logprintf_t logprintf;
 
-extern "C" AMX_NATIVE_INFO nativeList[] = {
+AMX_NATIVE_INFO nativeList[] = {
     { "Now", Natives::Now },
     { "TimeFormat", Natives::TimeFormat },
     { "TimeParse", Natives::TimeParse },
@@ -31,12 +31,12 @@ PLUGIN_EXPORT int PLUGIN_CALL AmxLoad(AMX* amx)
     return amx_Register(amx, nativeList, -1);
 }
 
-PLUGIN_EXPORT int PLUGIN_CALL Unload()
+PLUGIN_EXPORT void PLUGIN_CALL Unload()
 {
-    return 1;
+    logprintf("Chrono plugin unloaded.");
 }
 
 PLUGIN_EXPORT int PLUGIN_CALL AmxUnload(AMX* amx)
 {
-    return 1;
+    return AMX_ERR_NONE;
 }

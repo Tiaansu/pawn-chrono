@@ -11,6 +11,7 @@ AMX_NATIVE_INFO nativeList[] = {
     { "TimeFormat", Natives::TimeFormat },
     { "TimeParse", Natives::TimeParse },
     { "DurationParse", Natives::DurationParse },
+    { "DurationParseSeconds", Natives::DurationParseSeconds },
     { 0, 0 }
 };
 

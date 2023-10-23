@@ -8,6 +8,13 @@ std::map<std::string, chrono::milliseconds> unitMap = {
     { "d", chrono::hours(24) }
 };
 
+std::map<std::string, chrono::seconds> unitMapSeconds = {
+    { "s", chrono::seconds(1) },
+    { "m", chrono::minutes(1) },
+    { "h", chrono::hours(1) },
+    { "d", chrono::hours(24) }
+};
+
 cell Natives::Now(AMX* amx, cell* params)
 {
     return static_cast<int>(std::chrono::seconds(std::time(NULL)).count());
@@ -119,6 +126,89 @@ cell Natives::DurationParse(AMX* amx, cell* params)
             return 2;
         }
         resultDuration += static_cast<int>(value * unitMap.at(unit).count());
+
+        if (input[idx] == 0) {
+            break;
+        }
+
+        gotValue = false;
+        gotUnit = false;
+        unit = std::string();
+    }
+
+    *output = resultDuration;
+
+    return 0;
+}
+
+cell Natives::DurationParseSeconds(AMX* amx, cell* params)
+{
+    std::string input = amx_GetCppString(amx, params[1]);
+    cell* output;
+    amx_GetAddr(amx, params[2], &output);
+
+    size_t idx = 0,
+           length = input.length();
+
+    bool negative = false;
+    if (input[idx] == '-') {
+        negative = true;
+        idx++;
+    } else if (input[idx] == '+') {
+        negative = false;
+        idx++;
+    }
+
+    // The next character must be [0-9.]
+    if (!(input[idx] == '.' || '0' <= input[idx] && input[idx] <= '9')) {
+        return 1;
+    }
+
+    int numberBegin = -1,
+        value;
+
+    bool gotValue = false,
+         gotUnit = false;
+
+    std::string unit;
+    int resultDuration = 0;
+
+    while (idx <= length) {
+        if (!gotValue) {
+            if (numberBegin == -1) {
+                numberBegin = idx;
+
+                idx++;
+                continue;
+            } else {
+                if (!('0' <= input[idx] && input[idx] <= '9')) {
+                    gotValue = true;
+                    value = std::stoi(input.substr(numberBegin, idx - numberBegin));
+                    numberBegin = -1;
+
+                    continue;
+                }
+
+                idx++;
+                continue;
+            }
+        }
+        if (!gotUnit) {
+            if (input[idx] == 0 || !('a' <= input[idx] && input[idx] <= 'z')) {
+                gotUnit = true;
+                continue;
+            }
+
+            unit.push_back(input[idx]);
+
+            idx++;
+            continue;
+        }
+
+        if (unitMapSeconds.find(unit) == unitMapSeconds.end()) {
+            return 2;
+        }
+        resultDuration += static_cast<int>(value * unitMapSeconds.at(unit).count());
 
         if (input[idx] == 0) {
             break;

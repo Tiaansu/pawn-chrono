@@ -39,6 +39,7 @@ elseif(WIN32)
 	set(USE_SYSTEM_TZ_DB ON)
 endif()
 
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 add_subdirectory(lib/date)
 include_directories(lib/date/include)
 add_subdirectory(src)

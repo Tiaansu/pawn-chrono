@@ -1,0 +1,97 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: 
+      - 'master'
+      - 'dev'
+    paths:
+      - '**.hpp'
+      - '**.h'
+      - '**.cpp'
+      - '**.c'
+      - '**CMakeLists.txt'
+      - '.github/workflows/build.yml'
+
+jobs:
+  build-windows:
+    runs-on: windows-2019
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+          clean: true
+
+      - name: Install CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: '3.30.1'
+
+      - name: Generate build files
+        run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -A Win32
+
+      - name: Build
+        run: cd build && cmake --build . --config Release
+
+      - name: Declare GitHub variables
+        id: vars
+        shell: bash
+        run: |
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Get current time
+        uses: josStorer/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYYMMDD
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrono-windows
+          path: plugins/Release/chrono.dll
+  
+  build-linux:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+          clean: true
+
+      - name: Install packages
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install gcc-8-multilib g++-8-multilib libstdc++6:i386 libc6:i386
+      
+      - name: Generate build files
+        run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -A Win32
+  
+      - name: Build
+        run: cd build && cmake --build . --config Release
+
+      - name: Declare GitHub variables
+        id: vars
+        shell: bash
+        run: |
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Get current time
+        uses: josStorer/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYYMMDD
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrono-linux
+          path: plugins/Release/chrono.so

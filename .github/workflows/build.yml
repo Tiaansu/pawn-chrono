@@ -53,10 +53,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: chrono-windows
-          path: plugins/Release/chrono.dll
+          path: test/plugins/Release/chrono.dll
   
   build-linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v4
@@ -94,4 +94,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: chrono-linux
-          path: plugins/Release/chrono.so
+          path: test/plugins/Release/chrono.so
